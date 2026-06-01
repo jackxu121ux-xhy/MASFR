@@ -1,0 +1,85 @@
+# Synthetic PCD from: python synth_pcd.py --params parameters_test --layer connect_obstacles \
+#   --out pointcloude/synth_parameters_test_connect_obstacles.pcd
+#
+# Start / end: MUST match utils/parameters_test.py get_parameters() keys 'start' and 'end'
+# (same tuple for all layers: expand / connect / real_obstacles — only obstacle meshes differ).
+#
+#   start = (-24, -5, 0)   corner of free floor on the -x, mid-y side (within xlim×ylim)
+#   end   = (15.5, 6.5, 11) elevated target toward +x,+y, z≈11 (multi-modal / ramp scene)
+#
+# main_pcd uses YAML key 'end' (--end), not 'goal'.
+#
+# Run from repo root:
+#   python main_pcd.py --yml yml/pcd/synth_parameters_test_connect_obstacles.yml
+
+pcd: pointcloude/synth_parameters_test_real_obstacles.pcd
+up_axis: z
+seed: 0
+scale: 1
+
+voxel: 0.2
+r_safe: 2.0
+
+ground_thresh: 0.15
+ground_clearance: 0.1
+max_surface_z: 15.0
+max_slope_deg: 50.0
+surface_lift: null
+obstacle_radius_filter_radius: 0.0
+obstacle_radius_filter_min_neighbors: 0
+# Edge safety margin for elevated walkable surfaces. Larger values keep landing
+# farther from platform edges, but can erode small platforms completely.
+# With r_safe=1.0, null would also mean 1.0 and may leave landable_core=0.
+walkable_edge_margin: 0
+
+walkable_normal_radii: null
+z_min_walkable_surface: 0.04
+
+# 高程图方法 (Fankhauser & Hutter 2018)
+elev_max_roughness: 0.15   # 网格单元内 z 标准差上限 (米)
+elev_max_slope: 0.85       # 相邻网格间最大坡度 (dz/dx), 0.85≈tan(40°)
+elev_min_area: 0.25        # 连通区域最小面积 (m²)
+
+num_ground: 800
+num_surface: 2000
+num_aerial: 1200
+unified_walk: false
+
+rmax: 4.0
+wg: 5
+wf: 1
+e_factor: 0.1
+
+smoothing: 5.0
+spline_degree: 3
+lift_epsilon: 1.0
+
+# Confirmed vs parameters_test.py L10–L11
+start: [-24.0, -5.0, 0.0]
+end: [15.5, 6.5, 11.0]
+
+no_vis: false
+show_prm: false
+no_samples: false
+bg: dark
+dim_raw: 0.85
+keep_rgb: false
+point_size: 2.0
+vis_color: height
+vis_brightness: 1.0
+vis_cloud_voxel: 0.0
+vis_cloud_denoise: false
+vis_strip_ceiling: false
+vis_ceiling_gap: 0.12
+vis_show_normals: false
+vis_estimate_normals: false
+vis_lighting: false
+vis_recenter: false
+vis_zoom: 0.7
+vis_show_bbox: false
+vis_inflated_obstacles: true
+vis_inflated_mode: sphere
+vis_inflated_voxel: 0.0
+vis_inflated_max_centers: 7000
+vis_inflated_sphere_samples: 32
+vis_inflated_shells: 3

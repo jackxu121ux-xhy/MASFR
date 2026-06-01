@@ -1,0 +1,12 @@
+# Normalize line endings for text files on checkout
+* text=auto
+
+# Shell scripts always LF
+*.sh text eol=lf
+
+# Data / binaries
+*.pcd binary
+*.ply binary
+*.png binary
+*.jpg binary
+*.jpeg binary

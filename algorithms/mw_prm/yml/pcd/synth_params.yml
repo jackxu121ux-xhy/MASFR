@@ -1,0 +1,125 @@
+# Synthetic PCD demo configuration for main_pcd.py.
+# All distances are in the point-cloud/world coordinate units after any scale
+# transform. This synthetic file is already z-up, so up_axis stays "z".
+
+# Input point cloud path, relative to the repository root.
+pcd: pointcloude/synth_params.pcd
+
+# Coordinate convention of the input cloud. Use z for normal LiDAR/z-up data;
+# use y/x/-y/-z only when the source dataset's vertical axis differs.
+up_axis: z
+
+# Random seed for PRM sampling. Keep fixed for reproducible paths.
+seed: 0
+
+wg: 1
+wf: 5
+e_factor: 0.1
+# Start position [x, y, z]. If omitted, main_pcd.py picks a ground sample.
+start: [0.74, 3.76, 0.02]
+end: [100.75, 30.13, 8.0]
+
+# Preprocessing voxel size. Smaller preserves more geometry but increases
+# runtime; larger smooths/sparsifies the cloud and can remove thin surfaces.
+voxel: 0.2
+
+# Collision/inflation radius. Obstacles are treated as expanded by this radius
+# in 3D KD-tree collision checks, and the red inflated-obstacle visualization
+# uses this as its maximum shell radius.
+r_safe: 3.0
+
+# Maximum PRM connection distance. Larger creates more candidate edges and can
+# improve connectivity, but increases collision-checking cost.
+rmax: 10.0
+
+# Number of sampled crawl nodes on the ground/floor.
+num_ground: 600
+
+# Number of sampled crawl nodes on elevated walkable surfaces.
+num_surface: 800
+
+# Number of sampled aerial/free-flight nodes.
+num_aerial: 400
+
+# Height band around aligned ground z=0 removed from the 3D obstacle cloud.
+# Helps avoid false collisions from noisy wall-foot / ground-overlap points.
+# The 2.5D footprint heightmap still uses the full non-ground cloud.
+ground_clearance: 0.3
+
+# Optional radius-outlier filter on the final 3D obstacle cloud. Keep disabled
+# for clean synthetic data; enable for noisy real scans.
+obstacle_radius_filter_radius: 0.0
+obstacle_radius_filter_min_neighbors: 0
+
+# RANSAC ground-plane distance threshold. Larger absorbs more near-ground points
+# into the ground plane; smaller keeps more low geometry as non-ground.
+ground_thresh: 0.15
+
+# Edge safety margin for elevated walkable surfaces. Surface/crawl samples are
+# only taken from the interior of a walkable top face after eroding its XY
+# footprint by this distance. Larger avoids landing near edges but may erase
+# small platforms. null means default = r_safe.
+walkable_edge_margin: 0
+
+# Minimum height above ground for non-ground points to be considered elevated
+# walkable-surface candidates.
+z_min_walkable_surface: 0.04
+
+# 高程图方法 (Fankhauser & Hutter 2018)
+# Maximum z standard deviation inside an elevation-map cell. Larger accepts
+# rougher/noisier surfaces; smaller keeps only very flat regions.
+elev_max_roughness: 0.5
+
+# Maximum local elevation slope dz/dxy between neighboring cells. 0.85 is about
+# tan(40 degrees). Larger accepts steeper surfaces as walkable.
+elev_max_slope: 0.85
+
+# Minimum connected walkable area in square world units. Smaller keeps small
+# platforms/ledges; larger removes narrow or tiny landing regions.
+elev_min_area: 0.2
+
+# Visualization master switch. true runs planning without opening Open3D.
+no_vis: false
+
+# Viewer background color: dark or light.
+bg: dark
+
+# Dimming multiplier for the raw scene cloud after coloring. Lower makes path,
+# samples, and overlays stand out more.
+dim_raw: 0.9
+
+# If the input cloud has RGB colors, true preserves them instead of recoloring
+# by vis_color where applicable.
+keep_rgb: false
+
+# Open3D point size for raw/display point clouds.
+point_size: 2.0
+
+# Raw scene coloring mode. Common choices: height, intensity, curvature, normal,
+# rgb, uniform.
+vis_color: height
+
+# Brightness multiplier for raw scene colors after dim_raw.
+vis_brightness: 1.0
+
+# Open3D lighting toggle. false usually keeps colored point clouds brighter and
+# closer to visualize_pcd.py.
+vis_lighting: false
+
+# Show explicit red point-cloud approximation of the inflated obstacle volume.
+# The inflation radius itself is r_safe.
+vis_inflated_obstacles: true
+vis_inflated_mode: sphere
+vis_inflated_voxel: 0.0
+
+# Maximum number of obstacle centers used to draw the red inflated cloud. Larger
+# is denser but slower/heavier in the viewer.
+vis_inflated_max_centers: 6000
+
+# Number of directions sampled per inflation shell around each obstacle center.
+# Larger makes the red inflation look smoother.
+vis_inflated_sphere_samples: 32
+
+# Number of concentric shells drawn from r_safe/shells to r_safe. Larger fills
+# the inflated volume more visibly.
+vis_inflated_shells: 3

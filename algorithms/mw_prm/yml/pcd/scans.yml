@@ -1,0 +1,131 @@
+# main_pcd parameters (keys = argparse destinations, underscores)
+# Mirrors:
+#   python main_pcd.py --pcd datasets/livingroom.ply --up-axis y \
+#     --voxel 0.05 --r-safe 0.15 --rmax 5 \
+#     --ground-clearance 0.08 --max-surface-z 100.0 \
+#     --num-ground 1500 --num-surface 1500 --num-aerial 1500 \
+#     --start -10 -25 5 --end 2 3 5 \
+#     --wg 1 --wf 5 --e-factor 0.1 --scale 10 \
+#     --vis-strip-ceiling --vis-ceiling-gap 0.12 --unified-walk
+#
+# Run from repo root:
+#   ./run_from_yml.sh
+
+pcd: pointcloude/cleaned_scans_e_x10.pcd
+up_axis: z
+seed: 0
+
+# Environment / preprocessing
+voxel: 0.05
+r_safe: 0.5
+ground_thresh: 0.15
+ground_clearance: 0.08
+max_surface_z: 100.0
+max_slope_deg: 50.0
+surface_lift: null
+walkable_edge_margin: 0
+
+# Final obstacle-cloud radius outlier filter, applied AFTER:
+#   non_ground segmentation
+#   ground_clearance removal
+#   walkable surface carving
+#
+# Purpose:
+#   Real scans often contain isolated floating points, wall/ceiling fragments,
+#   and sparse misclassified non-ground noise. Because every remaining obstacle
+#   point becomes an r_safe inflation center, those sparse points can make the
+#   whole viewer look covered by red inflated obstacles and can also create
+#   false collision barriers.
+#
+# obstacle_radius_filter_radius:
+#   Search radius in metres/world units around each final obstacle point.
+#   A point is kept only if it has enough neighbours within this radius.
+#   Larger radius removes broader sparse-noise regions but may also erode thin
+#   real obstacles. 0 disables this filter.
+#
+# obstacle_radius_filter_min_neighbors:
+#   Minimum neighbour count required inside obstacle_radius_filter_radius.
+#   Larger values remove noise more aggressively; too large can delete real
+#   thin structures. 0 disables this filter.
+#
+# Tuning:
+#   If the red inflated layer looks like a red fog: increase radius to 0.3~0.5
+#   or min_neighbors to 4~6.
+#   If paths start passing through real obstacles: decrease them.
+# 如果一个障碍点在上述半径内邻居数量少于这个值，就认为它是孤立噪声点并删除。
+obstacle_radius_filter_radius: 0.33
+obstacle_radius_filter_min_neighbors: 4
+scale: 1
+
+# Ceiling crop (applied inside build_environment; same cloud for planner + viewer)
+vis_strip_ceiling: true
+vis_ceiling_gap: 0.12
+# vis_z_max: null
+# vis_ceiling_quantile: null
+
+# Walkable surface detection
+walkable_normal_radii: null
+z_min_walkable_surface: 0.04
+
+# 高程图方法 (Fankhauser & Hutter 2018)
+elev_max_roughness: 0.5 
+elev_max_slope: 0.85
+elev_min_area: 0.2
+
+# PRM
+num_ground: 800
+num_surface: 800
+num_aerial: 800
+
+unified_walk: true
+
+# Planner
+rmax: 5
+wg: 5
+wf: 1
+e_factor: 0.1
+
+# Path smoothing
+smoothing: 3.0
+spline_degree: 3
+lift_epsilon: 1.0
+
+start: [-15, -20, 1]
+end: [-5, 6, 1]
+
+# Visualization
+no_vis: false
+show_prm: false
+no_samples: false
+bg: dark
+# dim_raw only exists in main_pcd (multiplies scene colours after colouring).
+# visualize_pcd has no equivalent; use 1.0 if you want the same punch as YAML
+# next to visualize/cleaned_scans_e.yml for the same pcd+bg+brightness.
+dim_raw: 1.0
+keep_rgb: false
+point_size: 2.0
+# Scene cloud styling (aligned with visualize_pcd --color / --brightness, etc.)
+vis_color: height
+vis_brightness: 1.3
+vis_cloud_voxel: 0.0
+vis_cloud_denoise: false
+vis_show_normals: false
+vis_estimate_normals: false
+# visualize_pcd defaults to lighting OFF; Open3D light_on washes out/dims points.
+vis_lighting: false
+vis_recenter: false
+vis_zoom: 0.7
+vis_show_bbox: false
+vis_inflated_obstacles: true
+# Inflated obstacle visualization mode:
+#   sphere: draw sampled sphere shells around obstacle points; can look like
+#           individual balls when the real scan is sparse.
+#   voxel : voxelize obstacle points, dilate occupied voxels by r_safe, then
+#           draw voxel centers. Better for continuous wall-like surfaces.
+vis_inflated_mode: voxel
+vis_inflated_voxel: 0.15
+vis_inflated_max_centers: 20000
+vis_inflated_sphere_samples: 64
+vis_inflated_shells: 1
+# path_radius: null
+# marker_radius: null
