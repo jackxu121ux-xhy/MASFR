@@ -1,4 +1,11 @@
-﻿# Annotated Videos
+# Videos
 
-This directory is reserved for annotated videos of successful and representative failed trials. Each video should be accompanied by a short manifest describing the scenario, surface, payload, mode sequence, and outcome.
+This directory contains annotated videos for MASFR demonstrations and representative trial outcomes.
 
+## Contents
+
+- `Successful and Failed Cases of Slope Perchings .mp4` - annotated video showing successful and failed slope-perching cases.
+
+## Notes
+
+The video file is included as supporting material for manuscript review and replication context. Keep future videos accompanied by a short note describing the scenario, surface, payload, mode sequence, and outcome.

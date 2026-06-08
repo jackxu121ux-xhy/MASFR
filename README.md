@@ -1,8 +1,8 @@
-﻿# MASFR: Multimodal Adhesion, Sliding, and Flying Robot
+# MASFR: Multimodal Adhesion, Sliding, and Flying Robot
 
 This repository collects replication materials for MASFR, a bioinspired multimodal robot that combines aerial flight with adhesion-assisted surface crawling. MASFR uses distributed micro-setae suction feet inspired by net-winged midge larvae, pressure-regulated adhesion-sliding gaits, and a multi-weighted probabilistic roadmap planner (MW-PRM) for structured multimodal path generation.
 
-The repository is organized to support manuscript review and replication. It includes the MW-PRM planner code and example point-cloud scenes, and reserves folders for raw experimental data, controller parameters, representative CAD/STL files, and annotated videos of successful and representative failed trials.
+The repository is organized to support manuscript review and replication. It includes the MW-PRM planner code and example point-cloud scenes, ROS 2 control software, STM32 crawler firmware, figure-level raw data, representative CAD/STL/STEP files, and an annotated video of successful and representative failed slope-perching trials.
 
 ## Manuscript Summary
 
@@ -20,26 +20,22 @@ Outdoor demonstrations on frozen lakeshores, rough pavement, inclined glass roof
 
 ```text
 MASFR/
-├── algorithms/
-│   └── mw_prm/                         # MW-PRM planner code and examples
-├── data/
-│   └── raw/                            # Raw experimental data placeholders
-│       ├── adhesion/
-│       ├── friction/
-│       ├── trajectory_tracking/
-│       ├── energy_consumption/
-│       └── repeated_trials/
-├── controller_parameters/              # Controller and execution parameters
-│   ├── crawling/
-│   ├── flight/
-│   └── multimodal_switching/
-├── cad/                                # Representative CAD/STL placeholders
-│   ├── dms_foot/
-│   └── leg_module/
-└── videos/
-    └── annotated/
-        ├── successes/
-        └── failures/
+|-- algorithms/
+|   `-- mw_prm/                         # MW-PRM planner code and examples
+|-- cad/                                # CAD, STL, and STEP geometry
+|   |-- Crawling System/
+|   |-- DMS_sucker/
+|   `-- Leg_Module/
+|-- multimodal control/                 # ROS 2 control stack and embedded crawling firmware
+|   |-- crawling/
+|   |   `-- program_stm/                # STM32 crawler control-board firmware
+|   `-- masfr_ros2_ws/                  # ROS 2 workspace for MASFR execution
+|-- raw data/                           # Figure-level Excel source data
+|   |-- Fig.3/
+|   |-- Fig.5/
+|   `-- Fig.7/
+`-- videos/
+    `-- Successful and Failed Cases of Slope Perchings .mp4
 ```
 
 ## MW-PRM Algorithm Module
@@ -72,11 +68,37 @@ python main_pcd.py --yml yml/pcd/synth_parameters_obstacles.yml --no-vis
 
 A successful run loads the synthetic point cloud, samples PRM nodes, connects feasible edges, runs multimodal A*, reports path waypoints and path length, then exits without opening the Open3D viewer because `--no-vis` is enabled.
 
+## ROS 2 Control Software And STM32 Firmware
+
+The execution software is organized under `multimodal control/`.
+
+- `multimodal control/masfr_ros2_ws/` is the MASFR ROS 2 workspace. It contains packages for PX4 offboard control, crawler serial control, TCP motion-capture input, VINS-compatible camera/IMU bridging, launch orchestration, and multimodal mission coordination.
+- `multimodal control/crawling/program_stm/` contains the STM32F405 firmware for the crawler control board. It receives serial command packets from the ROS 2 crawling client and drives the solenoid valves, pump output, servo/actuator initialization, and staged gait routines.
+- `multimodal control/crawling/` contains crawling-control notes and embedded firmware materials for adhesion-sliding locomotion.
+
+Because the control directory name contains a space, quote it in shell commands:
+
+```bash
+cd "multimodal control/masfr_ros2_ws"
+source /opt/ros/<ros2-distro>/setup.bash
+colcon build --symlink-install
+```
+
+## CAD, Raw Data, And Videos
+
+The repository includes releasable supporting materials:
+
+- `cad/` contains STEP/STL files for the crawling system layout, DMS sucker parts, and front/hind leg modules.
+- `raw data/` contains Excel source data for Fig.3, Fig.5, and Fig.7.
+- `videos/` contains the annotated slope-perching success and failure case video.
+
+See the README files in each directory for file-level indexes.
+
 ## Data and Materials Availability
 
-The manuscript states that the main data are available in the main text or supplementary materials. This repository is structured to deposit the raw data supporting adhesion, friction, trajectory-tracking, energy-consumption, and robot-level repeated-trial results. The folders currently reserve the expected locations for those files and include short notes describing the intended contents.
+The manuscript states that the main data are available in the main text or supplementary materials. This repository includes source data tables supporting the reported adhesion, friction, locomotion, and multimodal robot-level results, organized by manuscript figure.
 
-The repository also reserves locations for controller parameters, representative CAD/STL files of the DMS foot and leg module, and annotated videos of successful and representative failed trials. Additional hardware files may be made available from the corresponding authors upon reasonable request.
+The repository also includes control software, STM32 crawler firmware, representative CAD/STL/STEP files, and an annotated video of successful and representative failed slope-perching trials. Additional hardware files may be made available from the corresponding authors upon reasonable request.
 
 ## Current Scope and Limitations
 
